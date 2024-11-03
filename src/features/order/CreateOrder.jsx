@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/no-unescaped-entities */
-import { Form, redirect, useActionData } from "react-router-dom";
+import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import { createOrder } from "../../services/apiRestaurant";
 
 // https://uibakery.io/regex-library/phone-number
@@ -38,6 +38,9 @@ function CreateOrder() {
   const cart = fakeCart;
 
   const formErrors = useActionData();
+  const navigation = useNavigation();
+
+  const isSubmitting = navigation.state === "submitting";
 
   return (
     <div>
@@ -46,13 +49,23 @@ function CreateOrder() {
       <Form method="POST">
         <div>
           <label>First Name</label>
-          <input type="text" name="customer" required />
+          <input
+            type="text"
+            name="customer"
+            required
+            className="rounded-full border border-stone-400 w-full px-4 py-2 focus:outline-none focus:ring focus:ring-yellow-300 text-sm placeholder:text-stone-400 transition-all duration-300 md:px-6 md:py-3"
+          />
         </div>
 
         <div>
           <label>Phone number</label>
           <div>
-            <input type="tel" name="phone" required />
+            <input
+              type="tel"
+              name="phone"
+              required
+              className="rounded-full border border-stone-400 w-full px-4 py-2 focus:outline-none focus:ring focus:ring-yellow-300 text-sm placeholder:text-stone-400 transition-all duration-300 md:px-6 md:py-3"
+            />
           </div>
           {formErrors?.phone && formErrors.phone}
         </div>
@@ -60,7 +73,12 @@ function CreateOrder() {
         <div>
           <label>Address</label>
           <div>
-            <input type="text" name="address" required />
+            <input
+              type="text"
+              name="address"
+              required
+              className="rounded-full border border-stone-400 w-full px-4 py-2 focus:outline-none focus:ring focus:ring-yellow-300 text-sm placeholder:text-stone-400 transition-all duration-300 md:px-6 md:py-3"
+            />
           </div>
         </div>
 
@@ -69,6 +87,7 @@ function CreateOrder() {
             type="checkbox"
             name="priority"
             id="priority"
+            className="focus:outline-none focus:ring focus:ring-yellow-300 accent-yellow-400 w-6 h-6"
             // value={withPriority}
             // onChange={(e) => setWithPriority(e.target.checked)}
           />
@@ -77,7 +96,11 @@ function CreateOrder() {
 
         <div>
           <input name="cart" value={JSON.stringify(cart)} hidden />
-          <button>Order now</button>
+          <button
+            disabled={isSubmitting}
+            className="bg-yellow-400 font-semibold px-3 py-2 text-stone-500 rounded-full uppercase hover:bg-yellow-300 transition-colors focus:bg-yellow-300 focus:outline-none focus:ring focus:ring-yellow-300 focus:ring-offset-2 disabled:cursor-not-allowed">
+            {isSubmitting ? "Place order...." : "Order now"}
+          </button>
         </div>
       </Form>
     </div>
