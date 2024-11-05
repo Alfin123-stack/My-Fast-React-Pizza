@@ -2,6 +2,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import { createOrder } from "../../services/apiRestaurant";
+import Button from "../../ui/Button";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
@@ -49,23 +50,13 @@ function CreateOrder() {
       <Form method="POST">
         <div>
           <label>First Name</label>
-          <input
-            type="text"
-            name="customer"
-            required
-            className="rounded-full border border-stone-400 w-full px-4 py-2 focus:outline-none focus:ring focus:ring-yellow-300 text-sm placeholder:text-stone-400 transition-all duration-300 md:px-6 md:py-3"
-          />
+          <input type="text" name="customer" required className="input" />
         </div>
 
         <div>
           <label>Phone number</label>
           <div>
-            <input
-              type="tel"
-              name="phone"
-              required
-              className="rounded-full border border-stone-400 w-full px-4 py-2 focus:outline-none focus:ring focus:ring-yellow-300 text-sm placeholder:text-stone-400 transition-all duration-300 md:px-6 md:py-3"
-            />
+            <input type="tel" name="phone" required className="input" />
           </div>
           {formErrors?.phone && formErrors.phone}
         </div>
@@ -73,12 +64,7 @@ function CreateOrder() {
         <div>
           <label>Address</label>
           <div>
-            <input
-              type="text"
-              name="address"
-              required
-              className="rounded-full border border-stone-400 w-full px-4 py-2 focus:outline-none focus:ring focus:ring-yellow-300 text-sm placeholder:text-stone-400 transition-all duration-300 md:px-6 md:py-3"
-            />
+            <input type="text" name="address" required className="input" />
           </div>
         </div>
 
@@ -96,11 +82,9 @@ function CreateOrder() {
 
         <div>
           <input name="cart" value={JSON.stringify(cart)} hidden />
-          <button
-            disabled={isSubmitting}
-            className="bg-yellow-400 font-semibold px-3 py-2 text-stone-500 rounded-full uppercase hover:bg-yellow-300 transition-colors focus:bg-yellow-300 focus:outline-none focus:ring focus:ring-yellow-300 focus:ring-offset-2 disabled:cursor-not-allowed">
+          <Button disabled={isSubmitting}>
             {isSubmitting ? "Place order...." : "Order now"}
-          </button>
+          </Button>
         </div>
       </Form>
     </div>
