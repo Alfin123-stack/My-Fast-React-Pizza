@@ -3,7 +3,13 @@
 import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import { createOrder } from "../../services/apiRestaurant";
 import Button from "../../ui/Button";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { clearItem, getCartItems, getTotalCartPrice } from "../cart/cartSlice";
+import store from "../../store";
+import { useState } from "react";
+import { formatCurrency } from "../../utils/helpers";
+import EmptyCart from "../cart/EmptyCart";
+import { fetchAddress } from "../users/userSlice";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
@@ -11,39 +17,54 @@ const isValidPhone = (str) =>
     str
   );
 
-const fakeCart = [
-  {
-    pizzaId: 12,
-    name: "Mediterranean",
-    quantity: 2,
-    unitPrice: 16,
-    totalPrice: 32,
-  },
-  {
-    pizzaId: 6,
-    name: "Vegetale",
-    quantity: 1,
-    unitPrice: 13,
-    totalPrice: 13,
-  },
-  {
-    pizzaId: 11,
-    name: "Spinach and Mushroom",
-    quantity: 1,
-    unitPrice: 15,
-    totalPrice: 15,
-  },
-];
+// const fakeCart = [
+//   {
+//     pizzaId: 12,
+//     name: "Mediterranean",
+//     quantity: 2,
+//     unitPrice: 16,
+//     totalPrice: 32,
+//   },
+//   {
+//     pizzaId: 6,
+//     name: "Vegetale",
+//     quantity: 1,
+//     unitPrice: 13,
+//     totalPrice: 13,
+//   },
+//   {
+//     pizzaId: 11,
+//     name: "Spinach and Mushroom",
+//     quantity: 1,
+//     unitPrice: 15,
+//     totalPrice: 15,
+//   },
+// ];
 
 function CreateOrder() {
-  // const [withPriority, setWithPriority] = useState(false);
-  const cart = fakeCart;
+  const [withPriority, setWithPriority] = useState(false);
+  const cart = useSelector(getCartItems);
 
   const formErrors = useActionData();
   const navigation = useNavigation();
-  const username = useSelector((state) => state.user.username);
 
   const isSubmitting = navigation.state === "submitting";
+
+  const dispatch = useDispatch();
+
+  const {
+    username,
+    status: addressStatus,
+    position,
+    address,
+    error,
+  } = useSelector((state) => state.user);
+
+  const totalCartPrice = useSelector(getTotalCartPrice);
+  const priority = withPriority ? totalCartPrice * 0.2 : 0;
+  const orderTotal = totalCartPrice + priority;
+
+  if (!cart.length) return <EmptyCart />;
 
   return (
     <div className="p-4">
@@ -52,7 +73,7 @@ function CreateOrder() {
       </h2>
 
       <Form method="POST" className="space-y-6">
-        <div className="sm:flex sm:justify-between">
+        <div className="sm:flex sm:justify-between items-center">
           <label className="font-semibold sm:basis-40">First Name</label>
           <input
             type="text"
@@ -63,7 +84,7 @@ function CreateOrder() {
           />
         </div>
 
-        <div className="sm:flex sm:justify-between">
+        <div className="sm:flex sm:justify-between items-center">
           <label className="font-semibold sm:basis-40">Phone number</label>
           <div className="sm:grow">
             <input type="tel" name="phone" required className="input w-full" />
@@ -75,16 +96,33 @@ function CreateOrder() {
           </div>
         </div>
 
-        <div className="sm:flex sm:justify-between">
+        <div className="sm:flex sm:justify-between items-center relative">
           <label className="font-semibold sm:basis-40">Address</label>
           <div className="sm:grow">
             <input
               type="text"
               name="address"
+              defaultValue={address}
               required
               className="input w-full"
+              disabled={addressStatus === "loading"}
             />
+            {error && (
+              <p className="text-xs font-semibold py-2 px-4 text-red-600 bg-red-200 mt-4 rounded-lg">
+                {error}
+              </p>
+            )}
           </div>
+          <span className="absolute top-[1.7rem] right-1 sm:top-2 sm:right-2">
+            <Button
+              type="small"
+              onClick={(e) => {
+                e.preventDefault();
+                dispatch(fetchAddress());
+              }}>
+              Get Location
+            </Button>
+          </span>
         </div>
 
         <div className="flex gap-2 items-center">
@@ -92,9 +130,10 @@ function CreateOrder() {
             type="checkbox"
             name="priority"
             id="priority"
-            className="focus:outline-none focus:ring focus:ring-yellow-300 accent-yellow-400 w-6 h-6"
             // value={withPriority}
-            // onChange={(e) => setWithPriority(e.target.checked)}
+            className="focus:outline-none focus:ring focus:ring-yellow-300 accent-yellow-400 w-6 h-6"
+            value={withPriority}
+            onChange={(e) => setWithPriority(e.target.checked)}
           />
           <label htmlFor="priority" className="font-semibold">
             Want to yo give your order priority?
@@ -103,8 +142,11 @@ function CreateOrder() {
 
         <div>
           <input name="cart" value={JSON.stringify(cart)} hidden />
+          <input name="position" value={position} hidden />
           <Button type="large" disabled={isSubmitting}>
-            {isSubmitting ? "Place order...." : "Order now"}
+            {isSubmitting
+              ? "Place order...."
+              : `Order order now on ${formatCurrency(orderTotal)}`}
           </Button>
         </div>
       </Form>
@@ -118,7 +160,7 @@ export async function action({ request }) {
 
   const newOrder = {
     ...data,
-    priority: data.priority === "on",
+    priority: data.priority === "true",
     cart: JSON.parse(data.cart),
   };
 
@@ -131,6 +173,8 @@ export async function action({ request }) {
   if (Object.keys(errors).length > 0) return errors;
 
   const order = await createOrder(newOrder);
+
+  store.dispatch(clearItem());
 
   return redirect("/order/" + order.id);
 }

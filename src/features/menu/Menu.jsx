@@ -7,11 +7,13 @@ function Menu() {
   const menu = useLoaderData();
 
   return (
-    <div className="divide-y-2 p-2">
+    <div className="divide-y-2 p-4">
       <h1 className="font-bold text-xl">Our Menu</h1>
-      {menu.map((pizza) => (
-        <MenuItem pizza={pizza} key={pizza.id} />
-      ))}
+      <ul>
+        {menu.map((pizza) => (
+          <MenuItem pizza={pizza} key={pizza.id} />
+        ))}
+      </ul>
     </div>
   );
 }

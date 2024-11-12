@@ -9,7 +9,7 @@ function Home() {
   // if (!username) return <Navigate to="/menu" />;
 
   return (
-    <div className="text-xl text-stone-600 text-center my-10 sm:text-3xl">
+    <div className="text-xl text-stone-600 text-center my-10 sm:text-3xl p-4">
       <h1 className="font-semibold mb-10">
         The best pizza.
         <br />
