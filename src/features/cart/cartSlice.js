@@ -36,6 +36,66 @@ const cartSlice = createSlice({
     deleteItem(state, aciton) {
       state.cart = state.cart.filter((item) => item.pizzaId !== aciton.payload);
     },
+    addIngredient: {
+      prepare(pizzaId, ingredient) {
+        return { payload: { pizzaId, ingredient } };
+      },
+      reducer(state, action) {
+        const item = state.cart.find(
+          (item) => item.pizzaId === action.payload.pizzaId
+        );
+        if (item) {
+          item.addIngredients.push(action.payload.ingredient);
+        }
+      },
+    },
+    removeIngredient: {
+      prepare(pizzaId, ingredient) {
+        return { payload: { pizzaId, ingredient } };
+      },
+      reducer(state, action) {
+        const item = state.cart.find(
+          (item) => item.pizzaId === action.payload.pizzaId
+        );
+        if (item) {
+          item.removeIngredients.push(action.payload.ingredient);
+        }
+      },
+    },
+    deleteAddIngredient: {
+      prepare(pizzaId, ingredient) {
+        return { payload: { pizzaId, ingredient } };
+      },
+      reducer(state, action) {
+        const item = state.cart.find(
+          (item) => item.pizzaId === action.payload.pizzaId
+        );
+        if (item) {
+          const newaddIngredients = item.addIngredients.filter(
+            (ingredient) => ingredient !== action.payload.ingredient
+          );
+
+          item.addIngredients = newaddIngredients;
+        }
+      },
+    },
+    deleteRemoveIngredient: {
+      prepare(pizzaId, ingredient) {
+        return { payload: { pizzaId, ingredient } };
+      },
+      reducer(state, action) {
+        const item = state.cart.find(
+          (item) => item.pizzaId === action.payload.pizzaId
+        );
+        if (item) {
+          const newRemoveIngredients = item.removeIngredients.filter(
+            (ingredient) => ingredient !== action.payload.ingredient
+          );
+
+          item.removeIngredients = newRemoveIngredients;
+        }
+      },
+    },
     increaseItemQuantity(state, aciton) {
       const item = state.cart.find((item) => item.pizzaId === aciton.payload);
 
@@ -61,6 +121,10 @@ const cartSlice = createSlice({
 export const {
   addItem,
   deleteItem,
+  addIngredient,
+  removeIngredient,
+  deleteAddIngredient,
+  deleteRemoveIngredient,
   increaseItemQuantity,
   decreaseItemQuantity,
   clearItem,

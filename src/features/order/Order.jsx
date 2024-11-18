@@ -1,15 +1,19 @@
 /* eslint-disable react-refresh/only-export-components */
 // Test ID: IIDSAT
 
-import { useLoaderData } from "react-router-dom";
+import { useFetcher, useLoaderData } from "react-router-dom";
 import { getOrder } from "../../services/apiRestaurant";
 import {
   calcMinutesLeft,
   formatCurrency,
   formatDate,
 } from "../../utils/helpers";
+8;
 
 import OrderItem from "./OrderItem";
+import { useEffect, useState } from "react";
+import UpdateOrder from "./UpdateOrder";
+import Button from "../../ui/Button";
 
 // const order = {
 //   id: "ABCDEF",
@@ -50,6 +54,19 @@ function Order() {
   // Everyone can search for all orders, so for privacy reasons we're gonna gonna exclude names or address, these are only for the restaurant staff
   const order = useLoaderData();
 
+  const fetcher = useFetcher();
+
+  const [isChange, setIsChange] = useState(false);
+
+  useEffect(
+    function () {
+      if (!fetcher.data && fetcher.state === "idle") {
+        fetcher.load("/menu");
+      }
+    },
+    [fetcher]
+  );
+
   const {
     id,
     status,
@@ -58,13 +75,16 @@ function Order() {
     orderPrice,
     estimatedDelivery,
     cart,
+    customer,
   } = order;
   const deliveryIn = calcMinutesLeft(estimatedDelivery);
 
   return (
     <div className="p-4 space-y-6">
       <div className="flex flex-wrap justify-between gap-2 items-center">
-        <h2 className="text-xl font-bold">Order #{id} status</h2>
+        <h2 className="text-xl font-bold">
+          Order #{id} status - {customer}
+        </h2>
 
         <div className="flex gap-2 items-center">
           {priority && (
@@ -91,7 +111,15 @@ function Order() {
 
       <ul className=" divide-y-2 border-t border-b">
         {cart.map((item) => (
-          <OrderItem key={item.id} item={item} />
+          <OrderItem
+            key={item.pizzaId}
+            item={item}
+            isLoadingIngredients={fetcher.state === "loading"}
+            ingredients={
+              fetcher.data?.find((el) => el.id === item.pizzaId).ingredients ||
+              []
+            }
+          />
         ))}
       </ul>
 
@@ -108,6 +136,16 @@ function Order() {
           To pay on delivery: {formatCurrency(orderPrice + priorityPrice)}
         </p>
       </div>
+
+      <UpdateOrder
+        isChange={isChange}
+        customer={customer}
+        priority={priority}
+      />
+
+      <Button type="large" onClick={() => setIsChange(!isChange)}>
+        {isChange ? "Cancel" : "Change Customer Name"}
+      </Button>
     </div>
   );
 }

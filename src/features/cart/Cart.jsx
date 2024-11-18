@@ -4,6 +4,8 @@ import LinkButton from "../../ui/LinkButton";
 import CartItem from "./CartItem";
 import { clearItem, getCartItems } from "./cartSlice";
 import EmptyCart from "./EmptyCart";
+import { useFetcher } from "react-router-dom";
+import { useEffect } from "react";
 
 // const fakeCart = [
 //   {
@@ -34,7 +36,23 @@ function Cart() {
 
   const cart = useSelector(getCartItems);
 
+  const addIngredient = useSelector(
+    (state) => state.cart.cart[0]?.addIngredients
+  );
+  console.log(addIngredient);
+
   const dispatch = useDispatch();
+
+  const fetcher = useFetcher();
+
+  useEffect(
+    function () {
+      if (!fetcher.data && fetcher.state === "idle") {
+        fetcher.load("/menu");
+      }
+    },
+    [fetcher]
+  );
 
   if (cart.length === 0) return <EmptyCart />;
 
@@ -46,7 +64,14 @@ function Cart() {
 
       <ul className="mt-6 divide-stone-300 divide-y-2 border-t border-b border-stone-300">
         {cart.map((item) => (
-          <CartItem key={item.pizzaId} item={item} />
+          <CartItem
+            key={item.pizzaId}
+            item={item}
+            ingredients={
+              fetcher.data?.find((el) => el.id === item.pizzaId).ingredients ||
+              []
+            }
+          />
         ))}
       </ul>
 
