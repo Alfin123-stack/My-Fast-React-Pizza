@@ -62,8 +62,8 @@ function OrderItem({ item, isLoadingIngredients, ingredients }) {
           </p>
         </div>
       </div>
-      {isRemove && <OrderIngredients ingredients={ingredients} />}
-      {isAdd && <OrderIngredients ingredients={pizzaIngredients} />}
+      {isRemove && <OrderIngredients type="remove" ingredients={ingredients} />}
+      {isAdd && <OrderIngredients type="add" ingredients={pizzaIngredients} />}
       <p className="text-sm capitalize italic text-stone-500">
         {isLoadingIngredients ? "Loading...." : ingredients.join(", ")}
       </p>

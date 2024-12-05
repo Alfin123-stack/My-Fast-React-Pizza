@@ -6,7 +6,6 @@ import { getOrder } from "../../services/apiRestaurant";
 import {
   calcMinutesLeft,
   formatCurrency,
-  formatDate,
 } from "../../utils/helpers";
 8;
 
@@ -76,8 +75,9 @@ function Order() {
     estimatedDelivery,
     cart,
     customer,
-  } = order;
+  } = order[0];
   const deliveryIn = calcMinutesLeft(estimatedDelivery);
+  console.log(deliveryIn)
 
   return (
     <div className="p-4 space-y-6">
@@ -100,17 +100,17 @@ function Order() {
 
       <div className="flex flex-wrap justify-between bg-stone-200 p-4 rounded-sm">
         <p className="font-semibold">
-          {deliveryIn >= 0
-            ? `Only ${calcMinutesLeft(estimatedDelivery)} minutes left 😃`
+          {deliveryIn.minutesLeft >= 0
+            ? `Only ${deliveryIn.minutesLeft} minutes left 😃`
             : "Order should have arrived"}
         </p>
         <p className="font-semibold">
-          (Estimated delivery: {formatDate(estimatedDelivery)})
+          (Estimated delivery: {deliveryIn.date.toLocaleString()})
         </p>
       </div>
 
       <ul className=" divide-y-2 border-t border-b">
-        {cart.map((item) => (
+        {cart?.map((item) => (
           <OrderItem
             key={item.pizzaId}
             item={item}

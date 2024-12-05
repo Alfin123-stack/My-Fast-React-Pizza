@@ -44,6 +44,8 @@ function CartItem({ item, ingredients }) {
 
   const currentQuantity = useSelector(getItemQuantityById(pizzaId));
 
+  
+
   return (
     <li className="py-4 ">
       <div className="flex justify-between items-center mb-5">
@@ -57,7 +59,7 @@ function CartItem({ item, ingredients }) {
           <DeleteButton pizzaId={pizzaId} />
         </div>
       </div>
-      <UpdateIngredients onAdd={handleAdd} onRemove={handleRemove} />
+      <UpdateIngredients onAdd={handleAdd} onRemove={handleRemove}  />
       {isRemove && (
         <OrderIngredients
           type="remove"
@@ -66,7 +68,7 @@ function CartItem({ item, ingredients }) {
         />
       )}
       {isAdd && (
-        <OrderIngredients pizzaId={pizzaId} ingredients={pizzaIngredients} />
+        <OrderIngredients pizzaId={pizzaId} ingredients={pizzaIngredients}/>
       )}
     </li>
   );

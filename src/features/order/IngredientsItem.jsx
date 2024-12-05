@@ -7,13 +7,17 @@ import {
 } from "../cart/cartSlice";
 
 /* eslint-disable react/prop-types */
-function IngredientsItem({ name, pizzaId, type }) {
+function IngredientsItem({ name, pizzaId, type, addIngredients, removeIngredients }) {
   const dispatch = useDispatch();
+
+  const addIngredientIsChecked = addIngredients?.find( ingredientName => ingredientName === name)
+  const removeIngredientIsChecked = removeIngredients?.find( ingredientName => ingredientName === name)
 
   if (type === "remove")
     return (
       <li className="space-x-2">
         <input
+        checked={removeIngredientIsChecked}
           type="checkbox"
           id={name}
           name="ingredients"
@@ -36,6 +40,7 @@ function IngredientsItem({ name, pizzaId, type }) {
   return (
     <li className="space-x-2">
       <input
+      checked={addIngredientIsChecked}
         type="checkbox"
         id={name}
         name="ingredients"
