@@ -5,6 +5,7 @@ import Button from "../../ui/Button";
 import { getOrder, updateOrder } from "../../services/apiRestaurant";
 
 function UpdateOrder({ customer, isChange, priority }) {
+
   const fetcher = useFetcher();
   return (
     <fetcher.Form method="PATCH" className="mt-7 bg-stone-200 p-4 rounded-sm">
@@ -26,7 +27,7 @@ function UpdateOrder({ customer, isChange, priority }) {
           name="priority"
           id="priority"
           className="focus:outline-none focus:ring focus:ring-yellow-300 accent-yellow-400 w-6 h-6"
-          defaultChecked={priority}
+          defaultChecked={priority === true ? true : false}
           disabled={!isChange || priority}
           // value={withPriority}
           // onChange={(e) => setWithPriority(e.target.checked)}
@@ -44,9 +45,9 @@ function UpdateOrder({ customer, isChange, priority }) {
 
 export async function action({ params, request }) {
   const order = await getOrder(params.id);
-  console.log(order);
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
+  console.log(data)
   const updateData = {
     priority: data.priority === "on",
     customer: data.customer.trim(),

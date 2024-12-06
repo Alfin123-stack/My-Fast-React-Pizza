@@ -75,9 +75,8 @@ function Order() {
     estimatedDelivery,
     cart,
     customer,
-  } = order[0];
+  } = order[0] 
   const deliveryIn = calcMinutesLeft(estimatedDelivery);
-  console.log(deliveryIn)
 
   return (
     <div className="p-4 space-y-6">

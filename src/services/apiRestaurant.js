@@ -1,6 +1,5 @@
-import { useSelector } from "react-redux";
+
 import supabase from "./supabase";
-import { getTotalCartPrice } from "../features/cart/cartSlice";
 
 const API_URL = "https://react-fast-pizza-api.onrender.com/api";
 
@@ -41,6 +40,9 @@ export async function getOrder(id) {
     console.error(error);
     throw new Error("Orders could not be loaded");
   }
+  if(!orders.length) {
+    throw new Error(`Order #${id} not found`);
+  }
   return orders;
 }
 
@@ -60,7 +62,6 @@ export async function createOrder(newOrder) {
   // } catch {
   //   throw Error("Failed creating your order");
   // }
-  console.log(newOrder)
 
   const { data, error } = await supabase
   .from('orders')
@@ -79,18 +80,32 @@ export async function createOrder(newOrder) {
 }
 
 export async function updateOrder(id, updateObj) {
-  try {
-    const res = await fetch(`${API_URL}/order/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify(updateObj),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  // try {
+  //   const res = await fetch(`${API_URL}/order/${id}`, {
+  //     method: "PATCH",
+  //     body: JSON.stringify(updateObj),
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   });
 
-    if (!res.ok) throw Error();
-    // We don't need the data, so we don't return anything
-  } catch {
-    throw Error("Failed updating your order");
+  //   if (!res.ok) throw Error();
+  //   // We don't need the data, so we don't return anything
+  // } catch {
+  //   throw Error("Failed updating your order");
+  // }
+
+  
+  const { data, error } = await supabase
+  .from('orders')
+  .update({...updateObj})
+  .eq('id', id)
+  .select()
+
+  if (error) {
+    console.error(error);
+    throw new Error("Orders could not be updated");
   }
+  
+  return data;
 }
