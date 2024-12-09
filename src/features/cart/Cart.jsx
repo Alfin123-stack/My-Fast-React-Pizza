@@ -36,11 +36,6 @@ function Cart() {
 
   const cart = useSelector(getCartItems);
 
-  const addIngredient = useSelector(
-    (state) => state.cart.cart[0]?.addIngredients
-  );
-  console.log(addIngredient);
-
   const dispatch = useDispatch();
 
   const fetcher = useFetcher();

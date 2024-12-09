@@ -65,10 +65,11 @@ function CartItem({ item, ingredients }) {
           type="remove"
           pizzaId={pizzaId}
           ingredients={ingredients}
+          item={item}
         />
       )}
       {isAdd && (
-        <OrderIngredients pizzaId={pizzaId} ingredients={pizzaIngredients}/>
+        <OrderIngredients pizzaId={pizzaId} ingredients={pizzaIngredients} item={item}/>
       )}
     </li>
   );

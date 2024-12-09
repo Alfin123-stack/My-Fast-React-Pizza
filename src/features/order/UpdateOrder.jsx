@@ -4,20 +4,43 @@ import { useFetcher } from "react-router-dom";
 import Button from "../../ui/Button";
 import { getOrder, updateOrder } from "../../services/apiRestaurant";
 
-function UpdateOrder({ customer, isChange, priority }) {
+function UpdateOrder({ order, isChange, priority }) {
+  const {customer, address, phone} = order
 
   const fetcher = useFetcher();
   return (
     <fetcher.Form method="PATCH" className="mt-7 bg-stone-200 p-4 rounded-sm">
       <h1 className="mb-5 font-semibold text-xl">Update Order</h1>
       <div className="sm:flex sm:justify-between items-center mb-5">
-        <label className="font-semibold sm:basis-40">Customer Name</label>
+        <label className="font-semibold sm:basis-40">Name</label>
         <input
           type="text"
           name="customer"
           required
           className="input w-full sm:w-0 sm:grow"
           defaultValue={customer}
+          disabled={!isChange}
+        />
+      </div>
+      <div className="sm:flex sm:justify-between items-center mb-5">
+        <label className="font-semibold sm:basis-40">Adress</label>
+        <input
+          type="text"
+          name="address"
+          required
+          className="input w-full sm:w-0 sm:grow"
+          defaultValue={address}
+          disabled={!isChange}
+        />
+      </div>
+      <div className="sm:flex sm:justify-between items-center mb-5">
+        <label className="font-semibold sm:basis-40">Phone</label>
+        <input
+          type="text"
+          name="phone"
+          required
+          className="input w-full sm:w-0 sm:grow"
+          defaultValue={phone}
           disabled={!isChange}
         />
       </div>
@@ -44,12 +67,12 @@ function UpdateOrder({ customer, isChange, priority }) {
 }
 
 export async function action({ params, request }) {
-  const order = await getOrder(params.id);
+  const order = await getOrder(params.id); 
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
-  console.log(data)
   const updateData = {
-    priority: data.priority === "on",
+    ...data,
+    priority: data.priority === "on" || order[0].priority ? true :false,
     customer: data.customer.trim(),
   };
   console.log(updateData);

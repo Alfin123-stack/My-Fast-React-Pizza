@@ -7,7 +7,7 @@ import {
 } from "../cart/cartSlice";
 
 /* eslint-disable react/prop-types */
-function IngredientsItem({ name, pizzaId, type, addIngredients, removeIngredients }) {
+function IngredientsItem({ name, pizzaId, type, addIngredients, removeIngredients, disabled }) {
   const dispatch = useDispatch();
 
   const addIngredientIsChecked = addIngredients?.find( ingredientName => ingredientName === name)
@@ -17,6 +17,7 @@ function IngredientsItem({ name, pizzaId, type, addIngredients, removeIngredient
     return (
       <li className="space-x-2">
         <input
+        disabled={disabled}
         checked={removeIngredientIsChecked}
           type="checkbox"
           id={name}
@@ -40,6 +41,7 @@ function IngredientsItem({ name, pizzaId, type, addIngredients, removeIngredient
   return (
     <li className="space-x-2">
       <input
+      disabled={disabled}
       checked={addIngredientIsChecked}
         type="checkbox"
         id={name}

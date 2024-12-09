@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
-import { useSelector } from "react-redux";
 import IngredientsItem from "./IngredientsItem";
 
-function OrderIngredients({ ingredients, pizzaId, type }) {
+function OrderIngredients({ ingredients, pizzaId, type,item, disabled }) {
+  const getAddIngredients = item.addIngredients
+  const getRemoveIngredients = item.removeIngredients
 
-  const getAddIngredients = useSelector(state => state.cart.cart.find(item => item.pizzaId === pizzaId))?.addIngredients
-  const getRemoveIngredients = useSelector(state => state.cart.cart.find(item => item.pizzaId === pizzaId))?.removeIngredients
+  console.log(getAddIngredients)
 
   if (type === "remove")
     return (
@@ -13,6 +13,7 @@ function OrderIngredients({ ingredients, pizzaId, type }) {
         {ingredients.map((item) => {
           return (
             <IngredientsItem
+            disabled={disabled}
               key={item}
               type={type}
               name={item}
@@ -27,7 +28,15 @@ function OrderIngredients({ ingredients, pizzaId, type }) {
   return (
     <ul className="flex flex-row justify-start gap-4 my-4 flex-wrap border border-stone-300 p-2 rounded-lg">
       {ingredients.map((item) => {
-        return <IngredientsItem key={item} name={item} pizzaId={pizzaId} addIngredients={getAddIngredients} />;
+        return (
+          <IngredientsItem
+          disabled={disabled}
+            key={item}
+            name={item}
+            pizzaId={pizzaId}
+            addIngredients={getAddIngredients}
+          />
+        );
       })}
     </ul>
   );

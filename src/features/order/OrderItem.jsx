@@ -24,8 +24,8 @@ const pizzaIngredients = [
   "Feta",
 ];
 
-function OrderItem({ item, isLoadingIngredients, ingredients }) {
-  const { quantity, name, totalPrice } = item;
+function OrderItem({ item, isLoadingIngredients, ingredients}) {
+  const { quantity, name, totalPrice} = item;
 
   const [isRemove, setIsRemove] = useState(false);
   const [isAdd, setIsAdd] = useState(false);
@@ -62,8 +62,8 @@ function OrderItem({ item, isLoadingIngredients, ingredients }) {
           </p>
         </div>
       </div>
-      {isRemove && <OrderIngredients type="remove" ingredients={ingredients} />}
-      {isAdd && <OrderIngredients type="add" ingredients={pizzaIngredients} />}
+      {isRemove && <OrderIngredients disabled={true} item={item} type="remove" ingredients={ingredients} />}
+      {isAdd && <OrderIngredients disabled={true} item={item} type="add" ingredients={pizzaIngredients} />}
       <p className="text-sm capitalize italic text-stone-500">
         {isLoadingIngredients ? "Loading...." : ingredients.join(", ")}
       </p>

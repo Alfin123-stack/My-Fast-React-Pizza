@@ -75,6 +75,7 @@ function Order() {
     estimatedDelivery,
     cart,
     customer,
+    orderCode
   } = order[0] 
   const deliveryIn = calcMinutesLeft(estimatedDelivery);
 
@@ -82,7 +83,7 @@ function Order() {
     <div className="p-4 space-y-6">
       <div className="flex flex-wrap justify-between gap-2 items-center">
         <h2 className="text-xl font-bold">
-          Order #{id} status - {customer}
+          Order #{orderCode} status - {customer}
         </h2>
 
         <div className="flex gap-2 items-center">
@@ -137,8 +138,8 @@ function Order() {
       </div>
 
       <UpdateOrder
-        isChange={isChange}
-        customer={customer}
+      isChange={isChange}
+        order={order[0]}
         priority={priority}
       />
 
