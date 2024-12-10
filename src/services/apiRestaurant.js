@@ -1,5 +1,6 @@
 
 import supabase from "./supabase";
+import short from 'short-uuid';
 
 // const API_URL = "https://react-fast-pizza-api.onrender.com/api";
 
@@ -24,7 +25,7 @@ export async function getMenu() {
 
 }
 
-export async function getOrder(id) {
+export async function getOrder(orderCode) {
   // const res = await fetch(`${API_URL}/order/${id}`);
   // if (!res.ok) throw Error(`Couldn't find order #${id}`);
 
@@ -34,14 +35,14 @@ export async function getOrder(id) {
   let { data: orders, error } = await supabase
   .from('orders')
   .select('*')
-  .eq('id', id);  
+  .eq('orderCode', orderCode);  
 
   if (error) {
     console.error(error);
     throw new Error("Orders could not be loaded");
   }
   if(!orders.length) {
-    throw new Error(`Order #${id} not found`);
+    throw new Error(`Order #${orderCode} not found`);
   }
   return orders;
 }
@@ -66,7 +67,7 @@ export async function createOrder(newOrder) {
   const { data, error } = await supabase
   .from('orders')
   .insert([
-    { ...newOrder},
+    { ...newOrder, orderCode : short.generate(), pin: short.generate()},
   ])
   .select()
 
@@ -79,7 +80,7 @@ export async function createOrder(newOrder) {
 
 }
 
-export async function updateOrder(id, updateObj) {
+export async function updateOrder(orderCode, updateObj) {
   // try {
   //   const res = await fetch(`${API_URL}/order/${id}`, {
   //     method: "PATCH",
@@ -94,16 +95,18 @@ export async function updateOrder(id, updateObj) {
   // } catch {
   //   throw Error("Failed updating your order");
   // }
-  const { data, error } = await supabase
+  const { data, error, status } = await supabase
   .from('orders')
   .update({...updateObj})
-  .eq('id', id)
+  .eq('orderCode', orderCode)
   .select()
 
+
+  console.log(status)
   if (error) {
     console.error(error);
     throw new Error("Orders could not be updated");
   }
   
-  return data;
+  return {data, status};
 }

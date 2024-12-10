@@ -8,7 +8,8 @@ import {
   formatCurrency,
 } from "../../utils/helpers";
 8;
-
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 import OrderItem from "./OrderItem";
 import { useEffect, useState } from "react";
 import UpdateOrder from "./UpdateOrder";
@@ -67,23 +68,52 @@ function Order() {
   );
 
   const {
-    id,
     status,
     priority,
     priorityPrice,
     orderPrice,
     estimatedDelivery,
     cart,
-    customer,
-    orderCode
+    pin,
+    orderCode,
   } = order[0] 
   const deliveryIn = calcMinutesLeft(estimatedDelivery);
 
+  const [inputValue, setInputValue] = useState('')
+
+  // Show Swal function
+  const showSwal = () => {
+    withReactContent(Swal)
+      .fire({
+        title: <p>Insert Your PIN</p>,
+        input: 'text',
+        inputValue,
+        preConfirm: () => {
+          // Before confirming, capture the input value
+          return Swal.getInput()?.value || '';  // Prevent resetting before submitting
+        },
+      })
+      .then((result) => {
+        // If user pressed OK, you can handle the result
+        if (result.isConfirmed) {
+          setInputValue(result.value);  // Set the value to inputValue if needed
+        }
+      })
+      .finally(() => {
+        // Reset inputValue after confirmation or cancellation
+        setInputValue('');
+      });
+  };
+
+  // pin
+  const isValidPin = inputValue === pin ? true : false;
+  console.log(inputValue,pin)
+  console.log(isValidPin)
   return (
     <div className="p-4 space-y-6">
       <div className="flex flex-wrap justify-between gap-2 items-center">
         <h2 className="text-xl font-bold">
-          Order #{orderCode} status - {customer}
+          Order #{orderCode} status
         </h2>
 
         <div className="flex gap-2 items-center">
@@ -138,13 +168,17 @@ function Order() {
       </div>
 
       <UpdateOrder
+      isValidPin={isValidPin}
       isChange={isChange}
         order={order[0]}
         priority={priority}
       />
 
-      <Button type="large" onClick={() => setIsChange(!isChange)}>
-        {isChange ? "Cancel" : "Change Customer Name"}
+      <Button type="large" onClick={() => {
+        showSwal()
+        setIsChange(!isChange)
+      }}>
+        {isChange && inputValue === pin ? "Cancel" : "Update Order"}
       </Button>
     </div>
   );

@@ -10,6 +10,8 @@ import Order, { loader as orderLoader } from "./features/order/Order";
 import { action as updateOrderAction } from "./features/order/UpdateOrder";
 import AppLayOut from "./ui/AppLayOut";
 import Error from "./ui/Error";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const router = createBrowserRouter([
   {
@@ -47,7 +49,12 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <ToastContainer />
+    </>
+  );
 }
 
 export default App;

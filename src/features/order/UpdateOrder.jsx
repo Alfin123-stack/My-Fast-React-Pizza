@@ -3,9 +3,10 @@
 import { useFetcher } from "react-router-dom";
 import Button from "../../ui/Button";
 import { getOrder, updateOrder } from "../../services/apiRestaurant";
+import { toast } from "react-toastify";
 
-function UpdateOrder({ order, isChange, priority }) {
-  const {customer, address, phone} = order
+function UpdateOrder({ order, isChange, priority, isValidPin }) {
+  const { customer, address, phone } = order;
 
   const fetcher = useFetcher();
   return (
@@ -19,7 +20,7 @@ function UpdateOrder({ order, isChange, priority }) {
           required
           className="input w-full sm:w-0 sm:grow"
           defaultValue={customer}
-          disabled={!isChange}
+          disabled={!isChange || !isValidPin}
         />
       </div>
       <div className="sm:flex sm:justify-between items-center mb-5">
@@ -30,7 +31,7 @@ function UpdateOrder({ order, isChange, priority }) {
           required
           className="input w-full sm:w-0 sm:grow"
           defaultValue={address}
-          disabled={!isChange}
+          disabled={!isChange || !isValidPin}
         />
       </div>
       <div className="sm:flex sm:justify-between items-center mb-5">
@@ -41,7 +42,7 @@ function UpdateOrder({ order, isChange, priority }) {
           required
           className="input w-full sm:w-0 sm:grow"
           defaultValue={phone}
-          disabled={!isChange}
+          disabled={!isChange || !isValidPin}
         />
       </div>
       <div className="flex gap-2 items-center">
@@ -51,7 +52,7 @@ function UpdateOrder({ order, isChange, priority }) {
           id="priority"
           className="focus:outline-none focus:ring focus:ring-yellow-300 accent-yellow-400 w-6 h-6"
           defaultChecked={priority === true ? true : false}
-          disabled={!isChange || priority}
+          disabled={(!isChange || priority) || !isValidPin}
           // value={withPriority}
           // onChange={(e) => setWithPriority(e.target.checked)}
         />
@@ -60,23 +61,45 @@ function UpdateOrder({ order, isChange, priority }) {
         </label>
       </div>
       <div className="text-right">
-        {isChange && <Button type="large">Update Order</Button>}
+        {(isChange && isValidPin) && <Button type="large">Update</Button>}
       </div>
     </fetcher.Form>
   );
 }
 
 export async function action({ params, request }) {
-  const order = await getOrder(params.id); 
+  const order = await getOrder(params.id);
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
   const updateData = {
     ...data,
-    priority: data.priority === "on" || order[0].priority ? true :false,
+    priority: data.priority === "on" || order[0].priority ? true : false,
     customer: data.customer.trim(),
   };
-  console.log(updateData);
-  await updateOrder(params.id, updateData);
+  const { status } = await updateOrder(params.id, updateData);
+  if (status === 200) {
+    toast.success("Updated Order Successfully!", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+  } else if (status === 400) {
+    toast.error("Updated Order Failed!", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+  }
   return null;
 }
 

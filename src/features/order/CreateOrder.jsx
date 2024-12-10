@@ -180,7 +180,7 @@ export async function action({ request }) {
 
   store.dispatch(clearItem());
 
-  return redirect("/order/" + order[0].id);
+  return redirect("/order/" + order[0].orderCode);
 }
 
 export default CreateOrder;

@@ -15,33 +15,35 @@ export function formatDate(dateStr) {
 }
 
 export function calcMinutesLeft(timeStr) {
-  // const d1 = new Date().getTime();
-  // const d2 = new Date(dateStr).getTime();
-  // return Math.round((d2 - d1) / 60000);
- // Menggunakan regex untuk memecah waktu (jam, menit, detik, dan mikrodetik)
- const regex = /(\d{2}):(\d{2}):(\d{2})\.(\d{6})\+(\d{2})/;
- const match = timeStr.match(regex);
- 
- if (!match) {
-     throw new Error("Invalid time format");
- }
 
- const hours = parseInt(match[1], 10);
- const minutes = parseInt(match[2], 10);
- const seconds = parseInt(match[3], 10);
+  // Regex untuk menangkap format HH:MM:SS.ssssss+ZZ atau HH:MM:SS.sssss+ZZ (5 atau 6 digit mikrodetik)
+  const regex = /^(\d{2}):(\d{2}):(\d{2})\.(\d{5,6})\+(\d{2})$/;
+  const match = timeStr.match(regex);
 
- // Menghitung total menit
- const totalMinutes = Math.round(hours * 60 + minutes + seconds / 60); // Membulatkan menit untuk format yang lebih rapi
+  if (!match) {
+    console.error("Invalid time format:", timeStr);
+    throw new Error("Invalid time format");
+  }
 
- // Menghitung tanggal berdasarkan waktu yang diberikan
- const now = new Date();
- now.setUTCHours(hours, minutes, seconds, 0); // Set waktu UTC berdasarkan input
+  const hours = parseInt(match[1], 10);
+  const minutes = parseInt(match[2], 10);
+  const seconds = parseInt(match[3], 10);
+  const microseconds = parseInt(match[4], 10); // Mikrodetik (5 atau 6 digit)
+  //const timezoneOffset = parseInt(match[5], 10); // Zona waktu, tetapi tidak digunakan di sini
 
- // Mengonversi tanggal menjadi format ISO yang lebih rapi
- const formattedDate = now.toISOString();
+  // Menghitung total menit (dengan mikrodetik diubah menjadi bagian dari menit)
+  const totalMinutes = hours * 60 + minutes + seconds / 60 + microseconds / 60000000;
 
- return {
-     minutesLeft: totalMinutes,
-     date: formattedDate // Menggunakan format ISO yang lebih jelas
- };
+  // Menghitung waktu yang tersisa berdasarkan input waktu
+  const now = new Date();
+  now.setHours(hours, minutes, seconds, microseconds / 1000); // Menggunakan mikrodetik dalam milidetik
+
+  // Mengonversi waktu menjadi format ISO yang lebih jelas
+  const formattedDate = now.toISOString();
+
+  return {
+    minutesLeft: Math.round(totalMinutes),
+    date: formattedDate
+  };
 }
+
