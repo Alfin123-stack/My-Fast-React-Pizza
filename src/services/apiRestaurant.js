@@ -102,7 +102,10 @@ export async function updateOrder(orderCode, updateObj) {
   .select()
 
 
-  console.log(status)
+  if(status === 400){
+    return status
+  }
+
   if (error) {
     console.error(error);
     throw new Error("Orders could not be updated");

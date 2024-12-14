@@ -7,8 +7,8 @@ import { toast } from "react-toastify";
 
 function UpdateOrder({ order, isChange, priority, isValidPin }) {
   const { customer, address, phone } = order;
-
   const fetcher = useFetcher();
+  
   return (
     <fetcher.Form method="PATCH" className="mt-7 bg-stone-200 p-4 rounded-sm">
       <h1 className="mb-5 font-semibold text-xl">Update Order</h1>

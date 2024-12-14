@@ -5,7 +5,7 @@ import { createOrder } from "../../services/apiRestaurant";
 import Button from "../../ui/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { clearItem, getCartItems, getTotalCartPrice } from "../cart/cartSlice";
-import store from "../../store";
+import {store} from "../../store";
 import { useState } from "react";
 import { formatCurrency } from "../../utils/helpers";
 import EmptyCart from "../cart/EmptyCart";

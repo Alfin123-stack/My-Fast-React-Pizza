@@ -1,19 +1,16 @@
 /* eslint-disable react-refresh/only-export-components */
 // Test ID: IIDSAT
-
 import { useFetcher, useLoaderData } from "react-router-dom";
-import { getOrder } from "../../services/apiRestaurant";
-import {
-  calcMinutesLeft,
-  formatCurrency,
-} from "../../utils/helpers";
-8;
-import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
-import OrderItem from "./OrderItem";
 import { useEffect, useState } from "react";
+
 import UpdateOrder from "./UpdateOrder";
 import Button from "../../ui/Button";
+import CountdownTimer from "../../ui/CountdownTImer";
+import OrderItem from "./OrderItem";
+
+import { getOrder } from "../../services/apiRestaurant";
+import { calcMinutesLeft, formatCurrency } from "../../utils/helpers";
+import usePinValidation from "../../hooks/usePinValidation";
 
 // const order = {
 //   id: "ABCDEF",
@@ -52,21 +49,10 @@ import Button from "../../ui/Button";
 
 function Order() {
   // Everyone can search for all orders, so for privacy reasons we're gonna gonna exclude names or address, these are only for the restaurant staff
-  const order = useLoaderData();
-
-  const fetcher = useFetcher();
-
   const [isChange, setIsChange] = useState(false);
 
-  useEffect(
-    function () {
-      if (!fetcher.data && fetcher.state === "idle") {
-        fetcher.load("/menu");
-      }
-    },
-    [fetcher]
-  );
-
+  // menggunakan useLoaderData untuk mengambil data API sebelum dirender
+  const order = useLoaderData();
   const {
     status,
     priority,
@@ -76,45 +62,34 @@ function Order() {
     cart,
     pin,
     orderCode,
-  } = order[0] 
+  } = order[0];
   const deliveryIn = calcMinutesLeft(estimatedDelivery);
 
-  const [inputValue, setInputValue] = useState('')
+  // Mengfecth data yang ada di page /menu
+  const fetcher = useFetcher();
+  useEffect(
+    function () {
+      if (!fetcher.data && fetcher.state === "idle") {
+        fetcher.load("/menu");
+      }
+    },
+    [fetcher]
+  );
 
-  // Show Swal function
-  const showSwal = () => {
-    withReactContent(Swal)
-      .fire({
-        title: <p>Insert Your PIN</p>,
-        input: 'text',
-        inputValue,
-        preConfirm: () => {
-          // Before confirming, capture the input value
-          return Swal.getInput()?.value || '';  // Prevent resetting before submitting
-        },
-      })
-      .then((result) => {
-        // If user pressed OK, you can handle the result
-        if (result.isConfirmed) {
-          setInputValue(result.value);  // Set the value to inputValue if needed
-        }
-      })
-      .finally(() => {
-        // Reset inputValue after confirmation or cancellation
-        setInputValue('');
-      });
-  };
+  // Custom Hooks : usePinValidation Hooks
+  const {
+    inputValue,
+    timerUpdateOrder,
+    setTimerUpdateOrder,
+    showPinAlert,
+    isValidPin,
+  } = usePinValidation(pin, orderCode);
 
-  // pin
-  const isValidPin = inputValue === pin ? true : false;
-  console.log(inputValue,pin)
   console.log(isValidPin)
   return (
     <div className="p-4 space-y-6">
       <div className="flex flex-wrap justify-between gap-2 items-center">
-        <h2 className="text-xl font-bold">
-          Order #{orderCode} status
-        </h2>
+        <h2 className="text-xl font-bold">Order #{orderCode} status</h2>
 
         <div className="flex gap-2 items-center">
           {priority && (
@@ -168,18 +143,28 @@ function Order() {
       </div>
 
       <UpdateOrder
-      isValidPin={isValidPin}
-      isChange={isChange}
+        isValidPin={isValidPin}
+        isChange={isChange}
         order={order[0]}
         priority={priority}
       />
 
-      <Button type="large" onClick={() => {
-        showSwal()
-        setIsChange(!isChange)
-      }}>
-        {isChange && inputValue === pin ? "Cancel" : "Update Order"}
-      </Button>
+      <div className="flex justify-between ">
+        <Button
+          type="small"
+          onClick={() => {
+            showPinAlert();
+            setIsChange(prevState => !prevState);
+          }}>
+          {isChange && inputValue === pin ? "Cancel" : "Update Order"}
+        </Button>
+
+        <CountdownTimer
+          orderCode={orderCode}
+          initialTime={timerUpdateOrder}
+          setTimerUpdateOrder={setTimerUpdateOrder}
+        />
+      </div>
     </div>
   );
 }
