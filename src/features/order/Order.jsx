@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import UpdateOrder from "./UpdateOrder";
 import Button from "../../ui/Button";
-import CountdownTimer from "../../ui/CountdownTImer";
+import CountdownTimer from "../../ui/CountdownTimer";
 import OrderItem from "./OrderItem";
 
 import { getOrder } from "../../services/apiRestaurant";
